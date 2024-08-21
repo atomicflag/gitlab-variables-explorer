@@ -1,0 +1,39 @@
+[package]
+name = "gitlab-variables-explorer-ui"
+version = "0.1.0"
+edition = "2021"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+[dependencies]
+leptos = { version = "0.6", features = ["csr"] }
+wasm-bindgen = "0.2"
+wasm-bindgen-futures = "0.4"
+js-sys = "0.3"
+serde = { version = "1", features = ["derive"] }
+serde-wasm-bindgen = "0.6"
+console_error_panic_hook = "0.1.7"
+stylance = "0.5.1"
+tracing-subscriber-wasm = "0.1.0"
+tracing = "0.1.40"
+tracing-subscriber = "0.3.18"
+leptos_icons = "0.3.1"
+
+[dependencies.icondata]
+version = "0.4.0"
+default-features = false
+features = ["tabler-icons"]
+
+[dev-dependencies]
+wasm-bindgen-test = "0.3.0"
+
+[workspace]
+members = ["src-tauri"]
+
+[package.metadata.stylance]
+output_file = "./bundle.css"
+
+[profile.release]
+opt-level = 'z'
+lto = true
+codegen-units = 1
+strip = true

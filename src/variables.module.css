@@ -1,0 +1,16 @@
+.scrollable-list {
+    @apply w-full bg-gray-900 overflow-y-auto;
+}
+
+.item {
+    @apply w-full px-3 py-1.5 border-b border-b-gray-800 hover:bg-gray-700;
+}
+
+.label {
+    @apply w-full font-semibold text-sm pb-1;
+}
+
+.variable-edit {
+    @apply my-3 p-3 bg-gray-900 overflow-y-auto font-mono whitespace-pre-wrap
+        resize-none;
+}

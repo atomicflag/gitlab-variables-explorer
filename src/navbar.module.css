@@ -1,0 +1,13 @@
+.button-active {
+    @apply rounded-md block bg-gray-900 px-3 py-2 hover:bg-gray-700;
+}
+
+.button {
+    @apply rounded-md block px-3 py-2 hover:bg-gray-700;
+}
+
+.search-bar {
+    @apply flex-grow block w-full bg-gray-700 rounded-md border-0
+    py-2 px-2 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400
+    focus:ring-2 focus:ring-inset focus:ring-indigo-600;
+}

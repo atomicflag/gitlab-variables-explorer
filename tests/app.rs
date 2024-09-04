@@ -1,8 +1,8 @@
 mod fixtures;
 
 use fixtures::app as ui;
-use leptos::*;
 use gitlab_variables_explorer_ui::*;
+use leptos::*;
 use wasm_bindgen::JsCast;
 use wasm_bindgen_test::*;
 

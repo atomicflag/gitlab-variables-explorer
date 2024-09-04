@@ -1,5 +1,5 @@
-use leptos::*;
 use gitlab_variables_explorer_ui::*;
+use leptos::*;
 use wasm_bindgen::JsCast;
 use web_sys::Element;
 

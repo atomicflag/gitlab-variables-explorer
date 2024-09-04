@@ -1,16 +1,31 @@
-.scrollable-list {
-    @apply w-full bg-gray-900 overflow-y-auto;
-}
-
 .item {
     @apply w-full px-3 py-1.5 border-b border-b-gray-800 hover:bg-gray-700;
 }
 
 .label {
-    @apply w-full font-semibold text-sm pb-1;
+    @apply font-semibold text-sm pb-1;
+}
+
+.scrollable-list {
+    @apply bg-gray-900 overflow-y-auto;
+}
+
+.label, .scrollable-list {
+    @apply w-full shrink-0;
 }
 
 .variable-edit {
-    @apply my-3 p-3 bg-gray-900 overflow-y-auto font-mono whitespace-pre-wrap
-        resize-none;
+    @apply p-3 mb-3 shrink-0 bg-gray-900 overflow-y-auto font-mono whitespace-pre-wrap resize-none;
+}
+
+.h-resize {
+    @apply cursor-ew-resize px-1.5;
+}
+
+.v-resize {
+    @apply cursor-ns-resize py-1.5;
+}
+
+.h-resize, .v-resize {
+    @apply hover:bg-gray-700;
 }

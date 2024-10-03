@@ -46,12 +46,15 @@ pub fn NavBar(page: ReadSignal<Page>, set_page: WriteSignal<Page>) -> impl IntoV
         <nav>
             <div class="mx-auto px-3">
                 <div class="flex h-16 items-center justify-between">
-                    <div class="flex items-center space-x-3 flex-grow">
+                    <div class="flex items-center space-x-2 flex-grow">
                         <Show when=move || page.get() == Page::Variables>
                             <SearchBar
                                 search_string=search_string
                                 set_search_string=set_search_string
                             />
+                            <a href="#" class=style::button>
+                                <Icon width="1.5rem" height="1.5rem" icon=i::TbReload />
+                            </a>
                         </Show>
                         <Show when=move || page.get() == Page::Settings>
                             <div class="block w-full flex-grow font-bold">Settings</div>

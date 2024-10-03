@@ -1,9 +1,9 @@
 .button-active {
-    @apply rounded-md block bg-gray-900 px-3 py-2 hover:bg-gray-700;
+    @apply bg-gray-900;
 }
 
-.button {
-    @apply rounded-md block px-3 py-2 hover:bg-gray-700;
+.button, .button-active {
+    @apply rounded-md block px-2 py-2 hover:bg-gray-700;
 }
 
 .search-bar {

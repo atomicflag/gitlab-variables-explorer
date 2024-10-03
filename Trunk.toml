@@ -8,6 +8,7 @@ ignore = ["./src-tauri", "./bundle.css"]
 address = "127.0.0.1"
 port = 1420
 open = false
+ws_protocol = "ws"
 
 [[hooks]]
 stage = "pre_build"

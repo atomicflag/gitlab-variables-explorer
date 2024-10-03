@@ -1,19 +1,27 @@
 // Prevents additional console window on Windows in release, DO NOT REMOVE!!
 #![cfg_attr(not(debug_assertions), windows_subsystem = "windows")]
 
+mod config;
+
+use config::Config;
 use tracing::Level;
 use tracing_subscriber::fmt;
 
-// Learn more about Tauri commands at https://tauri.app/v1/guides/features/command
 #[tauri::command]
-fn greet(name: &str) -> String {
-    format!("Hello, {}! You've been greeted from Rust!", name)
+fn read_config() -> Config {
+    config::read_config()
+}
+
+#[tauri::command]
+fn write_config(config: Config) {
+    config::write_config(&config);
 }
 
 fn main() {
     fmt().with_max_level(Level::INFO).init();
     tauri::Builder::default()
-        .invoke_handler(tauri::generate_handler![greet])
+        .plugin(tauri_plugin_shell::init())
+        .invoke_handler(tauri::generate_handler![read_config, write_config])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
 }

@@ -24,8 +24,9 @@ pub fn ProjectList(#[prop(into)] width: Signal<i32>) -> impl IntoView {
 #[component]
 pub fn VariableList() -> impl IntoView {
     view! {
-        <div class=style::scrollable_list>
-            {(1..=6).map(|i| view! { <div class=style::item>"Variable "{i}</div> }).collect_view()}
+        <div class=style::scrollable_list.to_owned()
+            + " grow">
+            {(1..=25).map(|i| view! { <div class=style::item>"Variable "{i}</div> }).collect_view()}
         </div>
     }
 }
@@ -77,21 +78,21 @@ fn window_height() -> i32 {
         .expect("window height should be f64") as i32
 }
 
-fn element_bottom() -> (NodeRef<Div>, Signal<i32>) {
+fn element_top() -> (NodeRef<Div>, Signal<i32>) {
     let node_ref = create_node_ref::<Div>();
-    let UseElementBoundingReturn { bottom, .. } = use_element_bounding(node_ref);
-    (node_ref, (move || bottom.get() as i32).into())
+    let UseElementBoundingReturn { top, .. } = use_element_bounding(node_ref);
+    (node_ref, (move || top.get() as i32).into())
 }
 
 #[component]
 pub fn Variables() -> impl IntoView {
     let (h_resize_ref, h_resize_width) = horizontal_resize(300);
     let (v_resize_ref, v_resize_height) = vertical_resize(window_height() - 200);
-    let (container_ref, container_bottom) = element_bottom();
-    let edit_height = move || container_bottom.get() - v_resize_height.get();
+    let (container_ref, container_top) = element_top();
+    let edit_height = move || container_top.get() - v_resize_height.get();
     view! {
-        <div class="px-3 flex flex-col grow overflow-hidden" node_ref=container_ref>
-            <div class="flex gap-3">
+        <div class="px-3 flex flex-col grow overflow-hidden">
+            <div class="flex grow gap-3">
                 <div
                     class=style::label
                     style:width=move || format!("calc({}px - 0.75rem)", h_resize_width.get())
@@ -107,6 +108,11 @@ pub fn Variables() -> impl IntoView {
             </div>
             <div node_ref=v_resize_ref class=style::v_resize />
             <VariableEdit height=edit_height />
+            <div class="flex grow justify-end gap-3 pb-3" node_ref=container_ref>
+                <button class=style::button>Delete</button>
+                <button class=style::button>Revert</button>
+                <button class=style::button_accent>Save</button>
+            </div>
         </div>
     }
 }

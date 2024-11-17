@@ -24,8 +24,7 @@ pub fn ProjectList(#[prop(into)] width: Signal<i32>) -> impl IntoView {
 #[component]
 pub fn VariableList() -> impl IntoView {
     view! {
-        <div class=style::scrollable_list.to_owned()
-            + " grow">
+        <div class=style::scrollable_list.to_owned() + " grow">
             {(1..=25).map(|i| view! { <div class=style::item>"Variable "{i}</div> }).collect_view()}
         </div>
     }

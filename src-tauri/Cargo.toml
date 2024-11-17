@@ -20,6 +20,7 @@ tracing = "0.1"
 tracing-subscriber = "0.3.0"
 dirs = "5.0"
 tauri-plugin-shell = "2"
+toml = "0.8.19"
 
 [features]
 # This feature is used for production builds or when a dev server is not specified, DO NOT REMOVE!!

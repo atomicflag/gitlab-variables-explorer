@@ -4,17 +4,17 @@
 mod config;
 
 use config::Config;
-use tracing::Level;
+use tracing::{info, Level};
 use tracing_subscriber::fmt;
 
 #[tauri::command]
-fn read_config() -> Config {
-    config::read_config()
+fn read_config() -> Result<Config, String> {
+    config::read_config().map_err(|e| e.to_string())
 }
 
 #[tauri::command]
-fn write_config(config: Config) {
-    config::write_config(&config);
+fn write_config(config: Config) -> Result<(), String> {
+    config::write_config(&config).map_err(|e| e.to_string())
 }
 
 fn main() {

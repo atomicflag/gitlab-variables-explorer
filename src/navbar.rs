@@ -32,7 +32,11 @@ pub fn SearchBar(
 }
 
 #[component]
-pub fn NavBar(page: ReadSignal<Page>, set_page: WriteSignal<Page>) -> impl IntoView {
+pub fn NavBar(
+    page: ReadSignal<Page>,
+    set_page: WriteSignal<Page>,
+    #[prop(into)] on_refresh: Callback<()>,
+) -> impl IntoView {
     let (search_string, set_search_string) = create_signal(String::new());
     let button_style = move || match page.get() {
         Page::Settings => style::button_active,
@@ -52,7 +56,7 @@ pub fn NavBar(page: ReadSignal<Page>, set_page: WriteSignal<Page>) -> impl IntoV
                                 search_string=search_string
                                 set_search_string=set_search_string
                             />
-                            <a href="#" class=style::button>
+                            <a href="#" class=style::button on:click=move |_| on_refresh.call(())>
                                 <Icon width="1.5rem" height="1.5rem" icon=i::TbReload />
                             </a>
                         </Show>

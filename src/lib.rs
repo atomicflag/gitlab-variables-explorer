@@ -1,12 +1,12 @@
 pub mod app;
-pub mod navbar;
-pub mod settings;
-pub mod variables;
+mod navbar;
+mod settings;
+mod variables;
 
 pub use app::*;
-pub use navbar::*;
-pub use settings::*;
-pub use variables::*;
+use navbar::*;
+use settings::*;
+use variables::*;
 
 use leptos::*;
 use serde::{Deserialize, Serialize};
@@ -18,14 +18,19 @@ extern "C" {
     async fn invoke(cmd: &str, args: JsValue) -> Result<JsValue, JsValue>;
 }
 
-#[derive(Clone, Serialize, Deserialize, Debug)]
-pub struct Config {
+#[derive(Clone, Serialize, Deserialize, Debug, Default)]
+struct Config {
     host: String,
     token: String,
 }
 
+#[derive(Debug, Default)]
+struct Context {
+    config: Config
+}
+
 #[derive(PartialEq, Clone, Copy)]
-pub enum Page {
+enum Page {
     Variables,
     Settings,
 }

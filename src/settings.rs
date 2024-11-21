@@ -1,54 +1,48 @@
 use super::*;
 use leptos::*;
 use serde_wasm_bindgen::{from_value, to_value};
+use std::{cell::RefCell, rc::Rc};
 use tracing::error;
 
 stylance::import_crate_style!(style, "src/settings.module.css");
 
 #[derive(Serialize, Debug)]
-pub struct WriteConfigArgs {
+struct WriteConfigArgs {
     config: Config,
+}
+
+async fn write_config(config: Config) -> Result<(), String> {
+    let result = invoke(
+        "write_config",
+        to_value(&WriteConfigArgs { config }).expect("config serialization should succeed"),
+    )
+    .await;
+    match result {
+        Ok(_) => Ok(()),
+        Err(e) => Err(e.as_string().expect("value should be a valid string")),
+    }
 }
 
 #[component]
 pub fn Settings(set_page: WriteSignal<Page>) -> impl IntoView {
-    let (host, set_host) = create_signal(String::new());
-    let (token, set_token) = create_signal(String::new());
-    spawn_local(async move {
-        let result = invoke("read_config", JsValue::null()).await;
-        match result {
-            Ok(config) => {
-                let config: Config = from_value(config).expect("value should be a valid config");
-                set_host.set(config.host);
-                set_token.set(config.token);
-            }
-            Err(e) => {
-                error!(
-                    "Error reading configuration file: {}",
-                    e.as_string().expect("value should be a valid string")
-                );
-            }
-        };
-    });
+    let context = use_context::<Rc<RefCell<Context>>>().expect("context should exist");
+    let (host, set_host) = create_signal(context.borrow().config.host.clone());
+    let (token, set_token) = create_signal(context.borrow().config.token.clone());
+
     let on_save = move |_| {
+        let context = context.clone();
         spawn_local(async move {
-            let result = invoke(
-                "write_config",
-                to_value(&WriteConfigArgs {
-                    config: Config {
-                        host: host.get_untracked(),
-                        token: token.get_untracked(),
-                    },
-                })
-                .expect("config serialization should succeed"),
-            )
+            let result = write_config(Config {
+                host: host.get_untracked(),
+                token: token.get_untracked(),
+            })
             .await;
             if let Err(e) = result {
-                error!(
-                    "Error saving the configuration file: {}",
-                    e.as_string().expect("value should be a valid string")
-                );
+                error!("Error saving the configuration file: {}", e);
             };
+            let mut context = context.borrow_mut();
+            context.config.host = host.get_untracked();
+            context.config.token = token.get_untracked();
             set_page.set(Page::Variables);
         });
     };
@@ -79,7 +73,8 @@ pub fn Settings(set_page: WriteSignal<Page>) -> impl IntoView {
                     </div>
                 </div>
             </div>
-            <div class="mt-6 flex items-center justify-end">
+            <div class="mt-6 flex items-center gap-3 justify-end">
+                <button class=style::button>Cancel</button>
                 <button on:click=on_save class=style::save_button>
                     Save
                 </button>

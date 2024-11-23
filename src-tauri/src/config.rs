@@ -5,8 +5,8 @@ use std::{fs::{create_dir, read_to_string}, path::PathBuf};
 
 #[derive(Clone, Serialize, Deserialize, Debug, Default)]
 pub struct Config {
-    host: String,
-    token: String,
+    pub host: String,
+    pub token: String,
 }
 
 fn config_file() -> Result<PathBuf> {

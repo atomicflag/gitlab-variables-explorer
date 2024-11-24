@@ -24,11 +24,6 @@ struct Config {
     token: String,
 }
 
-#[derive(Debug, Default)]
-struct Context {
-    config: Config
-}
-
 #[derive(PartialEq, Clone, Copy)]
 enum Page {
     Variables,

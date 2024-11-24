@@ -1,7 +1,6 @@
 use super::*;
 use leptos::*;
 use serde_wasm_bindgen::{from_value, to_value};
-use std::{cell::RefCell, rc::Rc};
 use tracing::error;
 
 stylance::import_crate_style!(style, "src/settings.module.css");
@@ -23,14 +22,29 @@ async fn write_config(config: Config) -> Result<(), String> {
     }
 }
 
+async fn read_config() -> Result<Config, String> {
+    let result = invoke("read_config", JsValue::null()).await;
+    match result {
+        Ok(config) => Ok(from_value(config).expect("value should be a valid config")),
+        Err(e) => Err(e.as_string().expect("value should be a valid string")),
+    }
+}
+
 #[component]
 pub fn Settings(set_page: WriteSignal<Page>) -> impl IntoView {
-    let context = use_context::<Rc<RefCell<Context>>>().expect("context should exist");
-    let (host, set_host) = create_signal(context.borrow().config.host.clone());
-    let (token, set_token) = create_signal(context.borrow().config.token.clone());
-
+    let (host, set_host) = create_signal(String::new());
+    let (token, set_token) = create_signal(String::new());
+    spawn_local(async move {
+        let result = read_config().await;
+        match result {
+            Ok(config) => {
+                set_host.set(config.host);
+                set_token.set(config.token);
+            }
+            Err(e) => error!("Error reading configuration file: {}", e),
+        };
+    });
     let on_save = move |_| {
-        let context = context.clone();
         spawn_local(async move {
             let result = write_config(Config {
                 host: host.get_untracked(),
@@ -40,9 +54,6 @@ pub fn Settings(set_page: WriteSignal<Page>) -> impl IntoView {
             if let Err(e) = result {
                 error!("Error saving the configuration file: {}", e);
             };
-            let mut context = context.borrow_mut();
-            context.config.host = host.get_untracked();
-            context.config.token = token.get_untracked();
             set_page.set(Page::Variables);
         });
     };
@@ -78,7 +89,9 @@ pub fn Settings(set_page: WriteSignal<Page>) -> impl IntoView {
                 </div>
             </div>
             <div class="mt-6 flex items-center gap-3 justify-end">
-                <button class=style::button on:click=on_cancel>Cancel</button>
+                <button class=style::button on:click=on_cancel>
+                    Cancel
+                </button>
                 <button on:click=on_save class=style::save_button>
                     Save
                 </button>

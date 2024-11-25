@@ -8,6 +8,7 @@ use config::Config;
 use gitlab::Project;
 use serde::{Deserialize, Serialize};
 use std::sync::Mutex;
+use std::time::{Duration, Instant};
 use tauri::{Builder, Manager, State};
 use tracing::{info, Level};
 use tracing_subscriber::fmt;
@@ -17,8 +18,11 @@ use variables::BoundVariable;
 fn read_config(state: State<'_, Mutex<AppState>>) -> Result<Config, String> {
     let mut state = state.lock().unwrap();
     match config::read_config() {
-        Ok(config) => {state.config = config; Ok(state.config.clone())},
-        Err(e) => Err(e.to_string())
+        Ok(config) => {
+            state.config = config;
+            Ok(state.config.clone())
+        }
+        Err(e) => Err(e.to_string()),
     }
 }
 
@@ -36,14 +40,39 @@ pub struct ProjectsAndVariables {
 }
 
 #[tauri::command]
-async fn fetch_variables(state: State<'_, Mutex<AppState>>) -> Result<ProjectsAndVariables, String> {
+async fn search_variables(
+    state: State<'_, Mutex<AppState>>,
+    text: String,
+) -> Result<ProjectsAndVariables, String> {
+    {
+        let mut state = state.lock().unwrap();
+        if state
+            .last_update
+            .is_some_and(|v| v.elapsed() <= Duration::from_secs(10))
+        {
+            // TODO: filter projects/variables
+            return Ok(ProjectsAndVariables {
+                projects: state.projects.clone(),
+                variables: state.variables.clone(),
+            });
+        } else {
+            state.last_update = Some(Instant::now());
+        }
+    }
     let config = state.lock().unwrap().config.clone();
-    // TODO: save vars to the app state
     match variables::fetch_variables(&config).await {
-        Ok((projects, variables)) => Ok(ProjectsAndVariables {
-            projects,
-            variables,
-        }),
+        Ok((projects, variables)) => {
+            let mut state = state.lock().unwrap();
+            state.projects = projects;
+            state.variables = variables;
+            // Ideally we need an async lock/semaphore
+            state.last_update = Some(Instant::now());
+            // TODO: filter projects/variables
+            Ok(ProjectsAndVariables {
+                projects: state.projects.clone(),
+                variables: state.variables.clone(),
+            })
+        }
         Err(e) => Err(e.to_string()),
     }
 }
@@ -51,6 +80,9 @@ async fn fetch_variables(state: State<'_, Mutex<AppState>>) -> Result<ProjectsAn
 #[derive(Default)]
 struct AppState {
     config: Config,
+    projects: Vec<Project>,
+    variables: Vec<BoundVariable>,
+    last_update: Option<Instant>,
 }
 
 fn main() {
@@ -60,7 +92,7 @@ fn main() {
         .invoke_handler(tauri::generate_handler![
             read_config,
             write_config,
-            fetch_variables
+            search_variables
         ])
         .setup(|app| {
             app.manage(Mutex::new(AppState::default()));

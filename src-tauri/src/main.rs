@@ -40,23 +40,20 @@ pub struct ProjectsAndVariables {
 }
 
 #[tauri::command]
-async fn search_variables(
+async fn fetch_variables(
     state: State<'_, Mutex<AppState>>,
-    text: String,
 ) -> Result<ProjectsAndVariables, String> {
+    let _ = API_LOCK.lock().await;
     {
-        let mut state = state.lock().unwrap();
+        let state = state.lock().unwrap();
         if state
             .last_update
             .is_some_and(|v| v.elapsed() <= Duration::from_secs(10))
         {
-            // TODO: filter projects/variables
             return Ok(ProjectsAndVariables {
                 projects: state.projects.clone(),
                 variables: state.variables.clone(),
             });
-        } else {
-            state.last_update = Some(Instant::now());
         }
     }
     let config = state.lock().unwrap().config.clone();
@@ -65,9 +62,7 @@ async fn search_variables(
             let mut state = state.lock().unwrap();
             state.projects = projects;
             state.variables = variables;
-            // Ideally we need an async lock/semaphore
             state.last_update = Some(Instant::now());
-            // TODO: filter projects/variables
             Ok(ProjectsAndVariables {
                 projects: state.projects.clone(),
                 variables: state.variables.clone(),
@@ -85,6 +80,8 @@ struct AppState {
     last_update: Option<Instant>,
 }
 
+static API_LOCK: tokio::sync::Mutex<()> = tokio::sync::Mutex::const_new(());
+
 fn main() {
     fmt().with_max_level(Level::INFO).init();
     Builder::default()
@@ -92,7 +89,7 @@ fn main() {
         .invoke_handler(tauri::generate_handler![
             read_config,
             write_config,
-            search_variables
+            fetch_variables
         ])
         .setup(|app| {
             app.manage(Mutex::new(AppState::default()));

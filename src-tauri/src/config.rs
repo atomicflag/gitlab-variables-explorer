@@ -1,7 +1,10 @@
 use anyhow::{anyhow, Result};
 use dirs::config_local_dir;
 use serde::{Deserialize, Serialize};
-use std::{fs::{create_dir, read_to_string}, path::PathBuf};
+use std::{
+    fs::{create_dir, read_to_string},
+    path::PathBuf,
+};
 
 #[derive(Clone, Serialize, Deserialize, Debug, Default)]
 pub struct Config {
@@ -22,7 +25,12 @@ pub fn read_config() -> Result<Config> {
 
 pub fn write_config(config: &Config) -> Result<()> {
     let config_file = config_file()?;
-    create_dir(config_file.parent().ok_or_else(|| anyhow!("Invalid configuration directory"))?).unwrap_or_default();
+    create_dir(
+        config_file
+            .parent()
+            .ok_or_else(|| anyhow!("Invalid configuration directory"))?,
+    )
+    .unwrap_or_default();
     std::fs::write(config_file, toml::to_string(config)?)?;
     Ok(())
 }

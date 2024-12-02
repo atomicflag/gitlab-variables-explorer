@@ -92,7 +92,9 @@ fn main() {
             fetch_variables
         ])
         .setup(|app| {
-            app.manage(Mutex::new(AppState::default()));
+            let mut state = AppState::default();
+            state.config = config::read_config().unwrap_or_default();
+            app.manage(Mutex::new(state));
             Ok(())
         })
         .run(tauri::generate_context!())

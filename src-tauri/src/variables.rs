@@ -5,9 +5,9 @@ use gitlab::{
     types::{Project, ProjectVariable},
     GitlabBuilder, ProjectId,
 };
+use serde::{Deserialize, Serialize};
 use tokio::task::JoinSet;
 use tokio_stream::StreamExt;
-use serde::{Deserialize, Serialize};
 
 #[derive(Clone, Serialize, Deserialize, Debug)]
 pub struct BoundVariable {
@@ -15,7 +15,7 @@ pub struct BoundVariable {
     pub variable: ProjectVariable,
 }
 
-pub async fn fetch_variables(config: &Config) -> Result<(Vec<Project>,Vec<BoundVariable>)> {
+pub async fn fetch_variables(config: &Config) -> Result<(Vec<Project>, Vec<BoundVariable>)> {
     let client = GitlabBuilder::new(&config.host, &config.token)
         .build_async()
         .await?;

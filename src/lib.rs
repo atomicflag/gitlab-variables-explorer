@@ -4,12 +4,15 @@ mod settings;
 mod variables;
 
 pub use app::*;
+use gitlab::{
+    types::{Project, ProjectVariable},
+    ProjectId,
+};
+use leptos::*;
 use navbar::*;
+use serde::{Deserialize, Serialize};
 use settings::*;
 use variables::*;
-
-use leptos::*;
-use serde::{Deserialize, Serialize};
 use wasm_bindgen::prelude::*;
 
 #[wasm_bindgen]
@@ -28,4 +31,16 @@ struct Config {
 enum Page {
     Variables,
     Settings,
+}
+
+#[derive(Clone, Serialize, Deserialize, Debug)]
+pub struct BoundVariable {
+    pub project_id: ProjectId,
+    pub variable: ProjectVariable,
+}
+
+#[derive(Clone, Serialize, Deserialize, Debug)]
+pub struct ProjectsAndVariables {
+    pub projects: Vec<Project>,
+    pub variables: Vec<BoundVariable>,
 }

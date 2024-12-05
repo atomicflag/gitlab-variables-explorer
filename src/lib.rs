@@ -8,7 +8,7 @@ use gitlab::{
     types::{Project, ProjectVariable},
     ProjectId,
 };
-use leptos::*;
+use leptos::prelude::*;
 use navbar::*;
 use serde::{Deserialize, Serialize};
 use settings::*;

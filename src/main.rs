@@ -1,5 +1,5 @@
 use gitlab_variables_explorer_ui::App;
-use leptos::*;
+use leptos::prelude::*;
 use tracing_subscriber::fmt;
 use tracing_subscriber_wasm::MakeConsoleWriter;
 

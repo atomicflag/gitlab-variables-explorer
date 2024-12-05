@@ -1,5 +1,5 @@
 use super::*;
-use leptos::*;
+use leptos::{prelude::*, task::spawn_local};
 use serde_wasm_bindgen::{from_value, to_value};
 use tracing::error;
 
@@ -32,8 +32,8 @@ async fn read_config() -> Result<Config, String> {
 
 #[component]
 pub fn Settings(set_page: WriteSignal<Page>) -> impl IntoView {
-    let (host, set_host) = create_signal(String::new());
-    let (token, set_token) = create_signal(String::new());
+    let (host, set_host) = signal(String::new());
+    let (token, set_token) = signal(String::new());
     spawn_local(async move {
         let result = read_config().await;
         match result {

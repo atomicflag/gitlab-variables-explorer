@@ -1,6 +1,6 @@
 use super::*;
 use leptos::html::{Div, Textarea};
-use leptos::*;
+use leptos::prelude::*;
 use leptos_use::core::Position;
 use leptos_use::{
     use_draggable_with_options, use_element_bounding, UseDraggableOptions, UseDraggableReturn,
@@ -35,14 +35,13 @@ pub fn VariableEdit(#[prop(into)] height: Signal<i32>) -> impl IntoView {
     view! {
         <textarea
             class=style::variable_edit
-            contentEditable=true
             style:height=move || format!("calc({}px - 1.5rem)", height.get())
         />
     }
 }
 
 fn horizontal_resize(initial_width: i32) -> (NodeRef<Div>, Signal<i32>) {
-    let node_ref = create_node_ref::<Div>();
+    let node_ref: NodeRef<Div> = NodeRef::new();
     let UseDraggableReturn { x, .. } = use_draggable_with_options(
         node_ref,
         UseDraggableOptions::default()
@@ -52,11 +51,11 @@ fn horizontal_resize(initial_width: i32) -> (NodeRef<Div>, Signal<i32>) {
                 y: 0.0,
             }),
     );
-    (node_ref, (move || x.get() as i32).into())
+    (node_ref, Signal::derive(move || x.get() as i32))
 }
 
 fn vertical_resize(initial_height: i32) -> (NodeRef<Div>, Signal<i32>) {
-    let node_ref = create_node_ref::<Div>();
+    let node_ref: NodeRef<Div> = NodeRef::new();
     let UseDraggableReturn { y, .. } = use_draggable_with_options(
         node_ref,
         UseDraggableOptions::default()
@@ -66,11 +65,11 @@ fn vertical_resize(initial_height: i32) -> (NodeRef<Div>, Signal<i32>) {
                 y: initial_height as f64,
             }),
     );
-    (node_ref, (move || y.get() as i32).into())
+    (node_ref, Signal::derive(move || y.get() as i32))
 }
 
 fn window_height() -> i32 {
-    leptos::window()
+    leptos::leptos_dom::helpers::window()
         .inner_height()
         .expect("window should exist")
         .as_f64()
@@ -78,9 +77,9 @@ fn window_height() -> i32 {
 }
 
 fn element_top() -> (NodeRef<Div>, Signal<i32>) {
-    let node_ref = create_node_ref::<Div>();
+    let node_ref: NodeRef<Div> = NodeRef::new();
     let UseElementBoundingReturn { top, .. } = use_element_bounding(node_ref);
-    (node_ref, (move || top.get() as i32).into())
+    (node_ref, Signal::derive(move || top.get() as i32))
 }
 
 #[component]
@@ -88,7 +87,7 @@ pub fn Variables() -> impl IntoView {
     let (h_resize_ref, h_resize_width) = horizontal_resize(300);
     let (v_resize_ref, v_resize_height) = vertical_resize(window_height() - 200);
     let (container_ref, container_top) = element_top();
-    let edit_height = move || container_top.get() - v_resize_height.get();
+    let edit_height = Signal::derive(move || *container_top.read() - *v_resize_height.read());
     view! {
         <div class="px-3 flex flex-col grow overflow-hidden">
             <div class="flex grow gap-3">

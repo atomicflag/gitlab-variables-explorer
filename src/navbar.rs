@@ -1,6 +1,6 @@
 use super::*;
 use icondata as i;
-use leptos::*;
+use leptos::prelude::*;
 use leptos_icons::*;
 
 stylance::import_crate_style!(style, "src/navbar.module.css");
@@ -24,7 +24,7 @@ pub fn SearchBar(
                     class="absolute right-2 inset-y-0"
                     on:click=move |_| set_search_string.set(String::new())
                 >
-                    <Icon width="1.5rem" height="1.5rem" icon=i::TbX />
+                    //<Icon width="1.5rem" height="1.5rem" icon=i::TbX />
                 </button>
             </Show>
         </div>
@@ -37,7 +37,7 @@ pub fn NavBar(
     set_page: WriteSignal<Page>,
     #[prop(into)] on_refresh: Callback<()>,
 ) -> impl IntoView {
-    let (search_string, set_search_string) = create_signal(String::new());
+    let (search_string, set_search_string) = signal(String::new());
     let button_style = move || match page.get() {
         Page::Settings => style::button_active,
         _ => style::button,
@@ -56,15 +56,15 @@ pub fn NavBar(
                                 search_string=search_string
                                 set_search_string=set_search_string
                             />
-                            <a href="#" class=style::button on:click=move |_| on_refresh.call(())>
-                                <Icon width="1.5rem" height="1.5rem" icon=i::TbReload />
+                            <a href="#" class=style::button on:click=move |_| on_refresh.run(())>
+                            //<Icon width="1.5rem" height="1.5rem" icon=i::TbReload />
                             </a>
                         </Show>
                         <Show when=move || page.get() == Page::Settings>
                             <div class="block w-full flex-grow font-bold">Settings</div>
                         </Show>
                         <a href="#" class=button_style on:click=toggle_settings>
-                            <Icon width="1.5rem" height="1.5rem" icon=i::TbSettings />
+                            //<Icon width="1.5rem" height="1.5rem" icon=i::TbSettings />
                         </a>
                     </div>
                 </div>

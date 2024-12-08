@@ -14,6 +14,7 @@ use serde::{Deserialize, Serialize};
 use settings::*;
 use variables::*;
 use wasm_bindgen::prelude::*;
+use reactive_stores::Store;
 
 #[wasm_bindgen]
 extern "C" {
@@ -39,8 +40,9 @@ pub struct BoundVariable {
     pub variable: ProjectVariable,
 }
 
-#[derive(Clone, Serialize, Deserialize, Debug)]
+#[derive(Clone, Serialize, Deserialize, Debug, Store, Default)]
 pub struct ProjectsAndVariables {
+    #[store(key: ProjectId = |row| row.id.clone())]
     pub projects: Vec<Project>,
     pub variables: Vec<BoundVariable>,
 }

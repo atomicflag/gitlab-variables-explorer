@@ -16,10 +16,18 @@ async fn fetch_variables() -> Result<ProjectsAndVariables, String> {
 #[component]
 pub fn App() -> impl IntoView {
     let (page, set_page) = signal(Page::Variables);
+    let state = Store::new(ProjectsAndVariables::default());
+    provide_context(state.clone());
     let on_refresh = move || {
-        info!("TODO: refresh");
         spawn_local(async move {
-            info!("{:?}", fetch_variables().await);
+            let result = fetch_variables().await;
+            match result {
+                Ok(value) => {
+                    state.variables().set(value.variables);
+                    state.projects().set(value.projects);
+                }
+                Err(e) => error!("Error fetching variables: {}", e),
+            };
         });
     };
     view! {

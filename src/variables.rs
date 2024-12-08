@@ -6,17 +6,26 @@ use leptos_use::{
     use_draggable_with_options, use_element_bounding, UseDraggableOptions, UseDraggableReturn,
     UseElementBoundingReturn,
 };
+use reactive_stores::StoreField;
 
 stylance::import_crate_style!(style, "src/variables.module.css");
 
 #[component]
 pub fn ProjectList(#[prop(into)] width: Signal<i32>) -> impl IntoView {
+    let state = expect_context::<Store<ProjectsAndVariables>>();
     view! {
         <div
             class=style::scrollable_list
             style:width=move || format!("calc({}px - 0.75rem)", width.get())
         >
-            {(1..=25).map(|i| view! { <div class=style::item>"Project "{i}</div> }).collect_view()}
+            <For
+                each=move || state.projects()
+                key=|row| row.read().id.clone()
+                children=|child| {
+                    let value = child.reader().expect("value should exist");
+                    view! { <div class=style::item>{value.name.clone()}</div> }
+                }
+            />
         </div>
     }
 }
@@ -24,7 +33,8 @@ pub fn ProjectList(#[prop(into)] width: Signal<i32>) -> impl IntoView {
 #[component]
 pub fn VariableList() -> impl IntoView {
     view! {
-        <div class=style::scrollable_list.to_owned() + " grow">
+        <div class=style::scrollable_list.to_owned()
+            + " grow">
             {(1..=25).map(|i| view! { <div class=style::item>"Variable "{i}</div> }).collect_view()}
         </div>
     }

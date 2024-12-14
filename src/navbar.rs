@@ -24,7 +24,7 @@ pub fn SearchBar(
                     class="absolute right-2 inset-y-0"
                     on:click=move |_| set_search_string.set(String::new())
                 >
-                    //<Icon width="1.5rem" height="1.5rem" icon=i::TbX />
+                    <Icon width="1.5rem" height="1.5rem" icon=i::TbX />
                 </button>
             </Show>
         </div>
@@ -56,15 +56,16 @@ pub fn NavBar(
                                 search_string=search_string
                                 set_search_string=set_search_string
                             />
+                            // TODO: make this disabled when is_refreshing is true
                             <a href="#" class=style::button on:click=move |_| on_refresh.run(())>
-                            //<Icon width="1.5rem" height="1.5rem" icon=i::TbReload />
+                                <Icon width="1.5rem" height="1.5rem" icon=i::TbReload />
                             </a>
                         </Show>
                         <Show when=move || page.get() == Page::Settings>
                             <div class="block w-full flex-grow font-bold">Settings</div>
                         </Show>
                         <a href="#" class=button_style on:click=toggle_settings>
-                            //<Icon width="1.5rem" height="1.5rem" icon=i::TbSettings />
+                            <Icon width="1.5rem" height="1.5rem" icon=i::TbSettings />
                         </a>
                     </div>
                 </div>

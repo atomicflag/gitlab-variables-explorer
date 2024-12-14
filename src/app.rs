@@ -5,7 +5,13 @@ use tracing::{error, info};
 
 stylance::import_crate_style!(style, "src/app.module.css");
 
-async fn fetch_variables() -> Result<ProjectsAndVariables, String> {
+#[derive(Clone, Serialize, Deserialize, Debug)]
+struct FetchVariablesResult {
+    pub projects: Vec<Project>,
+    pub variables: Vec<BoundVariable>,
+}
+
+async fn fetch_variables() -> Result<FetchVariablesResult, String> {
     let result = invoke("fetch_variables", JsValue::null()).await;
     match result {
         Ok(config) => Ok(from_value(config).expect("value should be a valid object")),
@@ -20,6 +26,7 @@ pub fn App() -> impl IntoView {
     provide_context(state.clone());
     let on_refresh = move || {
         spawn_local(async move {
+            state.is_refreshing().set(true);
             let result = fetch_variables().await;
             match result {
                 Ok(value) => {
@@ -28,6 +35,7 @@ pub fn App() -> impl IntoView {
                 }
                 Err(e) => error!("Error fetching variables: {}", e),
             };
+            state.is_refreshing().set(false);
         });
     };
     view! {

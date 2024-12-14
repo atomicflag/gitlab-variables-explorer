@@ -45,4 +45,6 @@ pub struct ProjectsAndVariables {
     #[store(key: ProjectId = |row| row.id.clone())]
     pub projects: Vec<Project>,
     pub variables: Vec<BoundVariable>,
+    pub active_project: Option<ProjectId>,
+    pub is_refreshing: bool
 }

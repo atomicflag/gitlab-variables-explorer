@@ -7,6 +7,7 @@ use leptos_use::{
     UseElementBoundingReturn,
 };
 use reactive_stores::StoreField;
+use thaw::*;
 
 stylance::import_crate_style!(style, "src/variables.module.css");
 
@@ -14,18 +15,10 @@ stylance::import_crate_style!(style, "src/variables.module.css");
 pub fn ProjectList(#[prop(into)] width: Signal<i32>) -> impl IntoView {
     let state = expect_context::<Store<ProjectsAndVariables>>();
     view! {
-        <div
-            class=style::scrollable_list
-            style:width=move || format!("calc({}px - 0.75rem)", width.get())
-        >
-            <For
-                each=move || state.projects()
-                key=|row| row.read().id.clone()
-                children=|child| {
-                    let value = child.reader().expect("value should exist");
-                    view! { <div class=style::item>{value.name.clone()}</div> }
-                }
-            />
+        <div style:width=move || format!("calc({}px - 0.75rem)", width.get())>
+            <For each=move || state.projects() key=|row| row.read().id.clone() let:project>
+                <div>{project.read().name.clone()}</div>
+            </For>
         </div>
     }
 }
@@ -33,21 +26,15 @@ pub fn ProjectList(#[prop(into)] width: Signal<i32>) -> impl IntoView {
 #[component]
 pub fn VariableList() -> impl IntoView {
     view! {
-        <div class=style::scrollable_list.to_owned()
-            + " grow">
-            {(1..=25).map(|i| view! { <div class=style::item>"Variable "{i}</div> }).collect_view()}
+        <div class="grow">
+            {(1..=25).map(|i| view! { <div>"Variable "{i}</div> }).collect_view()}
         </div>
     }
 }
 
 #[component]
 pub fn VariableEdit(#[prop(into)] height: Signal<i32>) -> impl IntoView {
-    view! {
-        <textarea
-            class=style::variable_edit
-            style:height=move || format!("calc({}px - 1.5rem)", height.get())
-        />
-    }
+    view! { <textarea style:height=move || format!("calc({}px - 1.5rem)", height.get()) /> }
 }
 
 fn horizontal_resize(initial_width: i32) -> (NodeRef<Div>, Signal<i32>) {
@@ -94,33 +81,67 @@ fn element_top() -> (NodeRef<Div>, Signal<i32>) {
 
 #[component]
 pub fn Variables() -> impl IntoView {
-    let (h_resize_ref, h_resize_width) = horizontal_resize(300);
-    let (v_resize_ref, v_resize_height) = vertical_resize(window_height() - 200);
-    let (container_ref, container_top) = element_top();
-    let edit_height = Signal::derive(move || *container_top.read() - *v_resize_height.read());
     view! {
-        <div class="px-3 flex flex-col grow overflow-hidden">
-            <div class="flex grow gap-3">
-                <div
-                    class=style::label
-                    style:width=move || format!("calc({}px - 0.75rem)", h_resize_width.get())
-                >
-                    Projects
-                </div>
-                <div class=style::label>Variables</div>
-            </div>
-            <div class="flex grow overflow-hidden">
-                <ProjectList width=h_resize_width />
-                <div node_ref=h_resize_ref class=style::h_resize />
-                <VariableList />
-            </div>
-            <div node_ref=v_resize_ref class=style::v_resize />
-            <VariableEdit height=edit_height />
-            <div class="flex grow justify-end gap-3 pb-3" node_ref=container_ref>
-                <button class=style::button>Delete</button>
-                <button class=style::button>Revert</button>
-                <button class=style::button_accent>Save</button>
-            </div>
-        </div>
+        <Flex class="grow p-2 overflow-hidden">
+            <Flex vertical=true class="min-w-[256px] overflow-y-auto" gap=FlexGap::Size(0)>
+                <a href="#" class="px-2 py-1 border-l-2 hover:bg-neutral-700">
+                    <Flex vertical=true align=FlexAlign::Start gap=FlexGap::Size(0)>
+                        <div class="text-xs text-gray-400">path / to / project</div>
+                        <div>"Project 0"</div>
+                    </Flex>
+                </a>
+                {(1..=25)
+                    .map(|i| {
+                        view! {
+                            <a
+                                href="#"
+                                class="px-2 py-1 border-l-2 hover:bg-neutral-700 border-transparent"
+                            >
+                                <Flex vertical=true align=FlexAlign::Start gap=FlexGap::Size(0)>
+                                    <div class="text-xs text-gray-400">path / to / project</div>
+                                    <div>"Project "{i}</div>
+                                </Flex>
+                            </a>
+                        }
+                    })
+                    .collect_view()}
+            </Flex>
+            <Flex vertical=true class="grow overflow-y-auto">
+                <Table>
+                    <TableHeader>
+                        <TableRow>
+                            <TableHeaderCell resizable=true min_width=100.0>
+                                "Name"
+                            </TableHeaderCell>
+                            <TableHeaderCell>"Value"</TableHeaderCell>
+                            <TableHeaderCell attr:width="100"></TableHeaderCell>
+                        </TableRow>
+                    </TableHeader>
+                    <TableBody>
+                        {(1..=25)
+                            .map(|i| {
+                                view! {
+                                    <TableRow class=style::row>
+                                        <TableCell>"GITLAB_VARIABLE_"{i}</TableCell>
+                                        <TableCell>"2"</TableCell>
+                                        <TableCell class=style::buttons>
+                                            <Button
+                                                appearance=ButtonAppearance::Transparent
+                                                icon=icondata::TbPencil
+                                            />
+                                            <Button
+                                                appearance=ButtonAppearance::Transparent
+                                                icon=icondata::TbTrash
+                                                class="text-red-700"
+                                            />
+                                        </TableCell>
+                                    </TableRow>
+                                }
+                            })
+                            .collect_view()}
+                    </TableBody>
+                </Table>
+            </Flex>
+        </Flex>
     }
 }

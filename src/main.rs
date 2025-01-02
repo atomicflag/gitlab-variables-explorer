@@ -10,7 +10,5 @@ fn main() {
         .with_ansi(false)
         .init();
     console_error_panic_hook::set_once();
-    mount_to_body(|| {
-        view! { <App /> }
-    })
+    mount_to_body(App)
 }

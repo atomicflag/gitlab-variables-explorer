@@ -57,7 +57,6 @@ pub fn Settings(set_page: WriteSignal<Page>) -> impl IntoView {
             set_page.set(Page::Variables);
         });
     };
-
     let on_cancel = move |_| {
         set_page.set(Page::Variables);
     };

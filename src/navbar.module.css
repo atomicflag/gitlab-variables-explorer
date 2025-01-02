@@ -3,7 +3,7 @@
 }
 
 .button, .button-active {
-    @apply rounded-md block px-2 py-2 hover:bg-gray-700;
+    @apply rounded-md block px-2 py-2 enabled:hover:bg-gray-700 disabled:text-gray-900;
 }
 
 .search-bar {

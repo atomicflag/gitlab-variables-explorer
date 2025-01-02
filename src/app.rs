@@ -1,6 +1,7 @@
 use super::*;
 use leptos::{prelude::*, task::spawn_local};
 use serde_wasm_bindgen::{from_value, to_value};
+use thaw::*;
 use tracing::{error, info};
 
 stylance::import_crate_style!(style, "src/app.module.css");
@@ -38,15 +39,16 @@ pub fn App() -> impl IntoView {
             state.is_refreshing().set(false);
         });
     };
+    let theme = RwSignal::new(Theme::dark());
     view! {
-        <main class="h-screen flex flex-col">
-            <NavBar page=page set_page=set_page on_refresh=on_refresh />
+        <ConfigProvider theme class="flex flex-col h-screen">
+            <NavBar page set_page on_refresh />
             <Show when=move || page.get() == Page::Variables>
                 <Variables />
             </Show>
             <Show when=move || page.get() == Page::Settings>
-                <Settings set_page=set_page />
+                <Settings set_page />
             </Show>
-        </main>
+        </ConfigProvider>
     }
 }
